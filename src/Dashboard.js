@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false); // Modal for Nearby Hospitals
   const [showChatHistory, setShowChatHistory] = useState(false); // Modal for Chat History
-  const [chatMessages, setChatMessages] = useState([]); // Chat messages
+  const [chatMessages, setChatMessages] = useState([]); // Chat messages in current conversation
+  const [chatHistory, setChatHistory] = useState([]); // All previous conversations
+  const [medicalHistory, setMedicalHistory] = useState([]); // Medical History
   const [messageInput, setMessageInput] = useState(''); // User input
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate('/login');
+  };
 
   // Handlers for modals
   const handleNearbyHospitalsClick = () => setShowModal(true);
@@ -15,24 +26,51 @@ const Dashboard = () => {
 
   // Add a new message to the chat
   const handleSendMessage = () => {
-    if (!messageInput.trim()) return; // Ignore empty messages
+    if (!messageInput.trim()) return;
 
     const userMessage = { type: 'user', content: messageInput };
-    const botResponse = { type: 'bot', content: getBotResponse(messageInput) };
+    const botResponse = getBotResponse(messageInput);
 
-    setChatMessages((prevMessages) => [...prevMessages, userMessage, botResponse]);
-    setMessageInput(''); // Clear input
+    setChatMessages((prevMessages) => [
+      ...prevMessages,
+      userMessage,
+      { type: 'bot', content: botResponse.message },
+    ]);
+
+    // Add diagnosis to Medical History if detected
+    if (botResponse.diagnosis) {
+      setMedicalHistory((prevHistory) =>
+        !prevHistory.includes(botResponse.diagnosis)
+          ? [...prevHistory, botResponse.diagnosis]
+          : prevHistory
+      );
+    }
+
+    setMessageInput('');
   };
 
   // Simulated bot response
   const getBotResponse = (userMessage) => {
-    // Replace this logic with your AI bot integration
     if (userMessage.toLowerCase().includes('headache')) {
-      return 'It might be due to stress or dehydration. Try drinking water and resting.';
+      return {
+        message: 'It might be due to stress or dehydration. Try drinking water and resting.',
+        diagnosis: 'Headache',
+      };
     } else if (userMessage.toLowerCase().includes('fever')) {
-      return 'Monitor your temperature and stay hydrated. Consult a doctor if it persists.';
+      return {
+        message: 'Monitor your temperature and stay hydrated. Consult a doctor if it persists.',
+        diagnosis: 'Fever',
+      };
     }
-    return 'I am here to help! Please provide more details.';
+    return { message: 'I am here to help! Please provide more details.', diagnosis: null };
+  };
+
+  // Move current chat to history
+  const saveChatToHistory = () => {
+    if (chatMessages.length > 0) {
+      setChatHistory((prevHistory) => [...prevHistory, chatMessages]);
+      setChatMessages([]); // Clear current chat
+    }
   };
 
   return (
@@ -54,9 +92,12 @@ const Dashboard = () => {
           <a href="#" className="ml-4 text-white hover:underline">
             About Us
           </a>
-          <a href="#" className="ml-4 text-white hover:underline">
+          <button
+            onClick={handleLogout}
+            className="ml-4 text-white hover:underline"
+          >
             Logout
-          </a>
+          </button>
         </div>
       </nav>
 
@@ -89,9 +130,13 @@ const Dashboard = () => {
             >
               <p>Medical History:</p>
               <ul>
-                <li>Disease 1: Asthma</li>
-                <li>Disease 2: Allergies</li>
-                <li>Disease 3: Diabetes</li>
+                {medicalHistory.length > 0 ? (
+                  medicalHistory.map((condition, index) => (
+                    <li key={index}>{condition}</li>
+                  ))
+                ) : (
+                  <li>No medical history available</li>
+                )}
               </ul>
             </div>
           </div>
@@ -144,6 +189,12 @@ const Dashboard = () => {
               >
                 Send
               </button>
+              <button
+                onClick={saveChatToHistory}
+                className="ml-2 bg-gray-500 text-white px-4 py-2 rounded-lg"
+              >
+                Save to History
+              </button>
             </div>
           </div>
 
@@ -151,7 +202,7 @@ const Dashboard = () => {
             <p>AI HealthCare Bot can make mistakes.</p>
           </div>
 
-          {/* Nearby Hospitals Button */}
+          {/* Get Nearby Hospitals Button */}
           <div className="mt-4">
             <button
               onClick={handleNearbyHospitalsClick}
@@ -171,10 +222,17 @@ const Dashboard = () => {
               Chat History
             </h2>
             <ul className="mt-4 text-sm">
-              {chatMessages.map((message, index) => (
-                <li key={index}>
-                  <strong>{message.type === 'bot' ? 'Bot' : 'User'}:</strong>{' '}
-                  {message.content}
+              {chatHistory.map((conversation, index) => (
+                <li key={index} className="mb-2">
+                  <strong>Conversation {index + 1}:</strong>
+                  <ul>
+                    {conversation.map((message, msgIndex) => (
+                      <li key={msgIndex}>
+                        <strong>{message.type === 'bot' ? 'Bot' : 'User'}:</strong>{' '}
+                        {message.content}
+                      </li>
+                    ))}
+                  </ul>
                 </li>
               ))}
             </ul>
