@@ -1,0 +1,42 @@
+/* Add custom styles for the login page */
+
+.login-page {
+    background-image: url('../public/ai.jpg'); /* Path to the background image */
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .login-form {
+    background-color: rgba(255, 255, 255, 0.2); /* More transparent white background */
+    padding: 2rem;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .login-form h1 {
+    color: #6b3f98; /* Purple color for the title */
+  }
+  
+  input {
+    border: 1px solid #b2a0b5; /* Light purple border */
+  }
+  
+  input:focus {
+    border-color: #6b3f98; /* Focused state with purple border */
+  }
+  
+  button {
+    background-color: #6b3f98;
+    transition: background-color 0.3s;
+  }
+  
+  button:hover {
+    background-color: #4a2e6d;
+  }
+  

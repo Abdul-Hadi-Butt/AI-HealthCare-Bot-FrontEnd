@@ -1,0 +1,25 @@
+/* Custom styles for chat bubbles */
+.chat-bubble {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 10px;
+    max-width: 75%;
+  }
+  
+  .user-bubble {
+    background-color: #e0e7ff; /* Light purple for user messages */
+    align-self: flex-end; /* Align to the right */
+  }
+  
+  .bot-bubble {
+    background-color: #dbeafe; /* Lighter purple for bot messages */
+    align-self: flex-start; /* Align to the left */
+  }
+  
+  #emergency-numbers {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: #e3342f; /* Red color for emergency numbers */
+  }
+  

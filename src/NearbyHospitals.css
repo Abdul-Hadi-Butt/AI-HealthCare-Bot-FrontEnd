@@ -1,0 +1,39 @@
+/* NearbyHospitals.css */
+.navbar {
+    background-color: #6b21a8;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .user-dp {
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+  }
+  
+  .sidebar {
+    width: 25%;
+    padding: 1rem;
+  }
+  
+  .chatbox {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  

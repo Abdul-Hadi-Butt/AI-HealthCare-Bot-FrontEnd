@@ -1,0 +1,52 @@
+/* Add custom styles for the signup page */
+
+.signup-page {
+  background-image: url('../public/ai.jpg'); /* Path to the background image */
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Style the signup form wrapper with a blurred background */
+.form-wrapper {
+  background-color: rgba(255, 255, 255, 0.4); /* Semi-transparent background */
+  backdrop-filter: blur(10px); /* Apply the blur to the background */
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1; /* Keep the content above the blurred background */
+}
+
+/* Ensure that the form content is clear and unaffected by the blur */
+.signup-form {
+  position: relative;
+  z-index: 2;
+}
+
+.signup-form h1 {
+  color: #6b3f98; /* Purple color for the title */
+}
+
+input {
+  border: 1px solid #b2a0b5; /* Light purple border */
+}
+
+input:focus {
+  border-color: #6b3f98; /* Focused state with purple border */
+}
+
+button {
+  background-color: #6b3f98;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #4a2e6d;
+}
