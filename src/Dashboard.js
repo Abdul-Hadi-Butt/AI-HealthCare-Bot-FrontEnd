@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
+import { diseaseFirstAid } from './diseaseFirstAid'; // Importing the disease and first aid data
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -17,7 +18,11 @@ const Dashboard = () => {
     navigate('/login');
   };
 
-  const handleNearbyHospitalsClick = () => setShowModal(true);
+  const handleNearbyHospitalsClick = () => {
+    // Navigate to the Nearby Hospitals page when clicked
+    navigate('/nearby-hospitals');
+  };
+
   const handleCloseModal = () => setShowModal(false);
   const handleViewChatHistory = () => setShowChatHistory(true);
   const handleCloseChatHistory = () => setShowChatHistory(false);
@@ -35,7 +40,6 @@ const Dashboard = () => {
       { type: 'bot', content: botResponse.message },
     ]);
 
-    // Add diagnosis to Medical History if detected
     if (botResponse.diagnosis) {
       setMedicalHistory((prevHistory) =>
         !prevHistory.includes(botResponse.diagnosis)
@@ -47,69 +51,58 @@ const Dashboard = () => {
     setMessageInput('');
   };
 
-  // Simulated bot response
   const getBotResponse = (userMessage) => {
-    if (userMessage.toLowerCase().includes('headache')) {
-      return {
-        message: 'It might be due to stress or dehydration. Try drinking water and resting.',
-        diagnosis: 'Headache',
-      };
-    } else if (userMessage.toLowerCase().includes('fever')) {
-      return {
-        message: 'Monitor your temperature and stay hydrated. Consult a doctor if it persists.',
-        diagnosis: 'Fever',
-      };
+    // Check for diseases in the message and return corresponding first aid instructions
+    const messageLower = userMessage.toLowerCase();
+
+    for (const disease in diseaseFirstAid) {
+      if (messageLower.includes(disease.toLowerCase())) {
+        return {
+          message: `You should follow these first aid instructions for ${disease}: ${diseaseFirstAid[disease].join(", ")}`,
+          diagnosis: disease,
+        };
+      }
     }
-    return { message: 'I am here to help! Please provide more details.', diagnosis: null };
+
+    // Default response if no disease is mentioned
+    return { message: "I am here to help! Please provide me Information what you are facing in detail.", diagnosis: null };
   };
 
-  // Move current chat to history
   const saveChatToHistory = () => {
     if (chatMessages.length > 0) {
-      setChatHistory((prevHistory) => [...prevHistory, [...chatMessages]]);
+      setChatHistory((prevHistory) => [
+        ...prevHistory,
+        chatMessages.map((msg) => ({
+          type: msg.type === 'bot' ? 'Bot' : 'User',
+          content: msg.content,
+        })),
+      ]);
       setChatMessages([]); // Clear current chat
     }
   };
 
   return (
     <div className="flex flex-col h-screen">
-      {/* Navigation Bar */}
       <nav className="bg-purple-900 text-white flex items-center justify-between p-4 shadow-md">
-  <div className="flex items-center">
-    <img
-      src="HADI.jpg"
-      alt="User DP"
-      className="h-10 w-10 rounded-full mr-3"
-    />
-    <span className="font-semibold text-lg">Hi, Abdul Hadi</span>
-  </div>
-  <div className="flex items-center">
-    <button
-      onClick={() => navigate('/Editprofile')}
-      className="text-white hover:underline"
-    >
-      User Profile
-    </button>
-    <button
-      onClick={() => navigate('/about-us')} // Redirects to About Us page
-      className="ml-4 text-white hover:underline"
-    >
-      About Us
-    </button>
-    <button
-      onClick={handleLogout}
-      className="ml-4 text-white hover:underline"
-    >
-      Logout
-    </button>
-  </div>
-</nav>
+        <div className="flex items-center">
+          <img src="HADI.jpg" alt="User DP" className="h-10 w-10 rounded-full mr-3" />
+          <span className="font-semibold text-lg">Hi, Abdul Hadi</span>
+        </div>
+        <div className="flex items-center">
+          <button onClick={() => navigate('/profile')} className="text-white hover:underline">
+            User Profile
+          </button>
+          <button onClick={() => navigate('/about-us')} className="ml-4 text-white hover:underline">
+            About Us
+          </button>
+          <button onClick={handleLogout} className="ml-4 text-white hover:underline">
+            Logout
+          </button>
+        </div>
+      </nav>
 
-      {/* Content */}
       <div className="flex flex-grow">
-        {/* Sidebar */}
         <div className="w-1/4 bg-purple-50 p-4 flex flex-col justify-between">
-          {/* Medical History */}
           <div>
             <h2 className="font-bold text-lg mb-4">Patient Record</h2>
             <div className="bg-white rounded-lg p-4 shadow-md">
@@ -125,8 +118,6 @@ const Dashboard = () => {
               </ul>
             </div>
           </div>
-
-          {/* Chat History Button */}
           <button
             onClick={handleViewChatHistory}
             className="w-full bg-purple-900 text-white px-4 py-2 rounded-lg mt-4"
@@ -135,7 +126,6 @@ const Dashboard = () => {
           </button>
         </div>
 
-        {/* Main Content */}
         <div className="w-3/4 p-4 flex flex-col justify-center relative">
           <h2 className="font-bold text-lg mb-4">Chat with AI Healthcare Bot</h2>
           <div className="bg-white rounded-lg p-4 shadow-md flex flex-col h-80">
@@ -176,62 +166,43 @@ const Dashboard = () => {
               </button>
             </div>
           </div>
+
+          {/* Button to Show Nearby Hospitals */}
+          <button
+            onClick={handleNearbyHospitalsClick}
+            className="w-full bg-purple-900 text-white px-4 py-2 rounded-lg mt-4"
+          >
+            Show Nearby Hospitals
+          </button>
         </div>
       </div>
 
-      {/* Nearby Hospitals Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-80">
-            <h2 className="text-lg font-semibold text-purple-900">
-              Nearby Hospitals & Clinics
-            </h2>
-            <ul className="mt-4 text-sm">
-              <li><strong>ABC Hospital</strong>: 2.5 km away</li>
-              <li><strong>XYZ Clinic</strong>: 3.8 km away</li>
-              <li><strong>General Hospital</strong>: 5.2 km away</li>
-            </ul>
-            <button
-              onClick={handleCloseModal}
-              className="mt-6 bg-purple-900 text-white px-4 py-2 rounded-lg"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Chat History Modal */}
       {showChatHistory && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-96">
             <h2 className="text-lg font-semibold text-purple-900">Chat History</h2>
             <div className="mt-4 text-sm max-h-80 overflow-y-auto">
-            {chatHistory.length > 0 ? (
-  chatHistory.map((conversation, index) => (
-    <div key={index} className="mb-4">
-      <h3 className="font-semibold">Conversation {index + 1}</h3>
-      <div className="bg-gray-100 p-2 rounded-lg shadow-sm">
-        {conversation.map((message, msgIndex) => (
-          <div
-            key={msgIndex}
-            className={`chat-bubble ${
-              message.type === 'bot' ? 'bot-bubble' : 'user-bubble'
-            }`}
-          >
-            <span className="font-bold">
-              {message.type === 'bot' ? 'Bot: ' : 'User: '}
-            </span>
-            {message.content}
-          </div>
-        ))}
-      </div>
-    </div>
-  ))
-) : (
-  <p>No chat history available.</p>
-)}
-
+              {chatHistory.length > 0 ? (
+                chatHistory.map((conversation, index) => (
+                  <div key={index} className="mb-4">
+                    <h3 className="font-semibold">Conversation {index + 1}</h3>
+                    <div className="bg-gray-100 p-2 rounded-lg shadow-sm">
+                      {conversation.map((message, msgIndex) => (
+                        <div
+                          key={msgIndex}
+                          className={`${
+                            message.type === 'Bot' ? 'bg-blue-500 text-white text-left' : 'bg-blue-200 text-black text-right'
+                          } p-2 rounded-lg my-1`}
+                        >
+                          <strong>{message.type}:</strong> {message.content}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>No chat history available.</p>
+              )}
             </div>
             <button
               onClick={handleCloseChatHistory}
@@ -247,4 +218,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

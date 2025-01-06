@@ -1,170 +1,156 @@
 import React, { useState } from 'react';
-import './NearbyHospitals.css'; // For custom styles
 
 const NearbyHospitals = () => {
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [patientRecordVisible, setPatientRecordVisible] = useState(false);
-  const [emergencyNumbers, setEmergencyNumbers] = useState([]);
-  const [nearbyHospitals, setNearbyHospitals] = useState([]);
-
-  const togglePatientRecord = () => {
-    setPatientRecordVisible(!patientRecordVisible);
-  };
-
-  const fetchEmergencyNumbers = (province) => {
-    const numbers = [
-      { name: 'Emergency Services', contact: '1122' },
-      { name: 'Local Hospital', contact: '042-37661110' },
-      { name: 'Doctor', contact: '(+92)3034844244' },
-    ];
-    if (province === 'Sindh') {
-      numbers.push({ name: 'Chippa Emergency', contact: '1022' });
-    } else {
-      numbers.push({ name: `Emergency numbers in ${province} may vary.`, contact: '' });
-    }
-    setEmergencyNumbers(numbers);
-  };
+  const [location, setLocation] = useState(null);
+  const [address, setAddress] = useState('');
+  const [hospitals, setHospitals] = useState([]);
+  const [error, setError] = useState('');
 
   const handleGetLocation = () => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        ({ coords: { latitude, longitude } }) => {
-          reverseGeocode(latitude, longitude);
-          fetchNearbyHospitals(latitude, longitude);
-        },
-        () => alert('Error fetching location.')
-      );
+      navigator.geolocation.getCurrentPosition(showPosition, showError);
     } else {
-      alert('Geolocation is not supported by this browser.');
+      alert("Geolocation is not supported by this browser.");
     }
   };
 
-  const reverseGeocode = (lat, lon) => {
-    const apiKey = '6393bd0035c343f1b97bf1fc62aa41e3'; // Replace with your actual API key
-    fetch(`https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=${apiKey}`)
-      .then((res) => res.json())
-      .then(({ results }) => {
-        if (results.length > 0) {
-          fetchEmergencyNumbers(results[0].components.province);
-        } else {
-          alert('No address found for these coordinates.');
-        }
-      })
-      .catch(() => alert('Error fetching location details.'));
+  const showPosition = (position) => {
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+    setLocation({ lat, lon });
+    reverseGeocode(lat, lon);
+    getNearbyHospitals(lat, lon);
   };
 
-  const fetchNearbyHospitals = (lat, lon) => {
-    const radius = 5000;
-    const query = `
-      [out:json];
-      (
-        node["amenity"="hospital"](around:${radius}, ${lat}, ${lon});
-        node["amenity"="clinic"](around:${radius}, ${lat}, ${lon});
-      );
-      out body;
-    `;
-    fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`)
-      .then((res) => res.json())
-      .then(({ elements }) => {
-        setNearbyHospitals(elements);
-        setModalOpen(true);
+  const reverseGeocode = (lat, lon) => {
+    const apiKey = '6393bd0035c343f1b97bf1fc62aa41e3';
+    const url = `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=${apiKey}`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        if (data.results.length > 0) {
+          const address = data.results[0].formatted;
+          setAddress(address);
+        } else {
+          alert("No address found for these coordinates.");
+        }
       })
-      .catch(() => alert('Error fetching nearby hospitals.'));
+      .catch(error => {
+        console.error('Error:', error);
+        alert("Error fetching location.");
+      });
+  };
+
+  const getNearbyHospitals = (lat, lon) => {
+    const radius = 8000;
+    const query = `
+        [out:json];
+        (
+            node["amenity"="hospital"](around:${radius}, ${lat}, ${lon});
+            node["amenity"="clinic"](around:${radius}, ${lat}, ${lon});
+        );
+        out body;
+    `;
+    const overpassUrl = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+
+    fetch(overpassUrl)
+      .then(response => response.json())
+      .then(data => {
+        setHospitals(data.elements);
+      })
+      .catch(error => {
+        console.error('Error fetching hospitals:', error);
+        setError('Error fetching hospitals.');
+      });
   };
 
   const haversineDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Radius of Earth in km
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLon = ((lon2 - lon1) * Math.PI) / 180;
-    const a =
+    const R = 6371;
+    const dLat = degreesToRadians(lat2 - lat1);
+    const dLon = degreesToRadians(lon2 - lon1);
+    const a = 
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
+      Math.cos(degreesToRadians(lat1)) * Math.cos(degreesToRadians(lat2)) * 
       Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
 
+  const degreesToRadians = (degrees) => {
+    return degrees * (Math.PI / 180);
+  };
+
+  const showError = (error) => {
+    switch (error.code) {
+      case error.PERMISSION_DENIED:
+        alert("User denied the request for Geolocation.");
+        break;
+      case error.POSITION_UNAVAILABLE:
+        alert("Location information is unavailable.");
+        break;
+      case error.TIMEOUT:
+        alert("The request to get user location timed out.");
+        break;
+      case error.UNKNOWN_ERROR:
+        alert("An unknown error occurred.");
+        break;
+    }
+  };
+
   return (
-    <div className="nearby-hospitals">
-      <nav className="navbar">
-        <div className="user-info">
-          <img src="HADI.jpg" alt="User DP" className="user-dp" />
-          <span>Hi, Abdul Hadi</span>
-        </div>
-        <div className="nav-links">
-          <a href="#">User Profile</a>
-          <a href="#">About Us</a>
-          <a href="#">Logout</a>
-        </div>
-      </nav>
+    <div
+      className="min-h-screen bg-cover bg-center"
+      style={{ 
+        backgroundImage: 'url(/aihospital)', // Reference the image in public folder
+        backgroundSize: 'cover',  // Ensures image covers the screen
+        backgroundPosition: 'center', // Centers the background
+        backgroundAttachment: 'fixed', // Keeps the background fixed while scrolling
+      }}
+    >
+      <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-lg mt-10 opacity-90">
+        <h2 className="text-3xl font-bold text-center text-blue-600 mb-4">Find Nearby Hospitals</h2>
+        
+        <button
+          onClick={handleGetLocation}
+          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+        >
+          Get Nearby Hospitals
+        </button>
 
-      <div className="content">
-        <aside className="sidebar">
-          <div className="patient-record">
-            <button onClick={togglePatientRecord}>Patient Record</button>
-            {patientRecordVisible && (
-              <div>
-                <p>Medical History:</p>
-                <ul>
-                  <li>Disease 1: Asthma</li>
-                  <li>Disease 2: Allergies</li>
-                  <li>Disease 3: Diabetes</li>
-                </ul>
-              </div>
-            )}
+        {address && (
+          <div className="mt-4 text-gray-700">
+            <p><strong>Address:</strong> {address}</p>
           </div>
+        )}
 
-          <div className="emergency-numbers">
-            <h2>Emergency Numbers</h2>
-            {emergencyNumbers.map((number, index) => (
-              <p key={index}>
-                {number.name}: {number.contact}
-              </p>
-            ))}
-          </div>
-        </aside>
+        {error && <p className="text-red-500 mt-2">{error}</p>}
 
-        <main className="main-content">
-          <h2>Chat with our AI Healthcare Bot</h2>
-          <div className="chatbox">
-            <div className="chat-messages">
-              <div className="chat-bubble bot-bubble">Hello! How can I assist you today?</div>
-              <div className="chat-bubble user-bubble">I have a headache and feel dizzy.</div>
-              <div className="chat-bubble bot-bubble">
-                Possible causes could be dehydration or tension headaches. Have you been drinking enough water?
-              </div>
-            </div>
-            <input type="text" placeholder="Type your message..." />
-          </div>
-          <button onClick={handleGetLocation}>Get Nearby Hospitals</button>
-        </main>
+        {hospitals.length > 0 && (
+          <ul className="mt-6 space-y-4">
+            {hospitals.map(hospital => {
+              const name = hospital.tags.name || 'Unnamed Hospital/Clinic';
+              const emergencyNumber = hospital.tags.emergency || 'No emergency number available';
+              const distance = haversineDistance(location.lat, location.lon, hospital.lat, hospital.lon).toFixed(2);
+
+              return (
+                <li
+                  key={hospital.id}
+                  className="bg-gray-100 p-4 rounded-lg shadow-sm hover:bg-gray-200 transition"
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-xl font-semibold text-gray-800">{name}</p>
+                      <p className="text-sm text-gray-500">Emergency: {emergencyNumber}</p>
+                    </div>
+                    <span className="text-sm text-gray-600">{distance} km</span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
-
-      {isModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Nearby Hospitals & Clinics</h2>
-            <ul>
-              {nearbyHospitals.length > 0 ? (
-                nearbyHospitals.map((hospital, index) => (
-                  <li key={index}>
-                    {haversineDistance(
-                      0, // Replace with user lat
-                      0, // Replace with user lon
-                      hospital.lat,
-                      hospital.lon
-                    ).toFixed(2)}{' '}
-                    km - {hospital.tags.name || 'Unnamed'}
-                  </li>
-                ))
-              ) : (
-                <li>No hospitals or clinics found nearby.</li>
-              )}
-            </ul>
-            <button onClick={() => setModalOpen(false)}>Close</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
