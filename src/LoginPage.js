@@ -25,6 +25,10 @@ function LoginPage() {
     navigate('/dashboard');
   };
 
+  const handleSignUpRedirect = () => {
+    navigate('/signup'); // Navigate to the signup page
+  };
+
   return (
     <div className="login-page">
       <div className="login-form">
@@ -76,9 +80,18 @@ function LoginPage() {
 
         <p className="text-center text-purple-700 mt-4">
           Don't have an account?{' '}
-          <a href="/signup" className="text-purple-900 font-semibold hover:underline">
+          <button
+            onClick={handleSignUpRedirect}
+            className="text-purple-900 font-semibold hover:underline focus:outline-none"
+            style={{
+              backgroundColor: 'transparent',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+            }}
+          >
             Sign up
-          </a>
+          </button>
         </p>
       </div>
     </div>

@@ -19,15 +19,13 @@ const Dashboard = () => {
   };
 
   const handleNearbyHospitalsClick = () => {
-    // Navigate to the Nearby Hospitals page when clicked
-    navigate('/nearby-hospitals');
+    navigate('/nearby-hospitals'); // Navigate to Nearby Hospitals page
   };
 
   const handleCloseModal = () => setShowModal(false);
   const handleViewChatHistory = () => setShowChatHistory(true);
   const handleCloseChatHistory = () => setShowChatHistory(false);
 
-  // Add a new message to the chat
   const handleSendMessage = () => {
     if (!messageInput.trim()) return;
 
@@ -52,20 +50,21 @@ const Dashboard = () => {
   };
 
   const getBotResponse = (userMessage) => {
-    // Check for diseases in the message and return corresponding first aid instructions
     const messageLower = userMessage.toLowerCase();
 
     for (const disease in diseaseFirstAid) {
       if (messageLower.includes(disease.toLowerCase())) {
         return {
-          message: `You should follow these first aid instructions for ${disease}: ${diseaseFirstAid[disease].join(", ")}`,
+          message: `You should follow these first aid instructions for ${disease}: ${diseaseFirstAid[disease].join(', ')}`,
           diagnosis: disease,
         };
       }
     }
 
-    // Default response if no disease is mentioned
-    return { message: "I am here to help! Please provide me Information what you are facing in detail.", diagnosis: null };
+    return {
+      message: 'I am here to help! Please provide me more details about what you are facing.',
+      diagnosis: null,
+    };
   };
 
   const saveChatToHistory = () => {
@@ -77,7 +76,7 @@ const Dashboard = () => {
           content: msg.content,
         })),
       ]);
-      setChatMessages([]); // Clear current chat
+      setChatMessages([]);
     }
   };
 
@@ -129,10 +128,7 @@ const Dashboard = () => {
         <div className="w-3/4 p-4 flex flex-col justify-center relative">
           <h2 className="font-bold text-lg mb-4">Chat with AI Healthcare Bot</h2>
           <div className="bg-white rounded-lg p-4 shadow-md flex flex-col h-80">
-            <div
-              className="flex flex-col h-64 overflow-y-auto p-2 border-b border-gray-200"
-              id="chat-messages"
-            >
+            <div className="flex flex-col h-64 overflow-y-auto p-2 border-b border-gray-200" id="chat-messages">
               {chatMessages.map((message, index) => (
                 <div
                   key={index}
@@ -166,8 +162,6 @@ const Dashboard = () => {
               </button>
             </div>
           </div>
-
-          {/* Button to Show Nearby Hospitals */}
           <button
             onClick={handleNearbyHospitalsClick}
             className="w-full bg-purple-900 text-white px-4 py-2 rounded-lg mt-4"
@@ -191,7 +185,9 @@ const Dashboard = () => {
                         <div
                           key={msgIndex}
                           className={`${
-                            message.type === 'Bot' ? 'bg-blue-500 text-white text-left' : 'bg-blue-200 text-black text-right'
+                            message.type === 'Bot'
+                              ? 'bg-blue-500 text-white text-left'
+                              : 'bg-blue-200 text-black text-right'
                           } p-2 rounded-lg my-1`}
                         >
                           <strong>{message.type}:</strong> {message.content}

@@ -69,9 +69,9 @@ const NearbyHospitals = () => {
     const R = 6371;
     const dLat = degreesToRadians(lat2 - lat1);
     const dLon = degreesToRadians(lon2 - lon1);
-    const a = 
+    const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(degreesToRadians(lat1)) * Math.cos(degreesToRadians(lat2)) * 
+      Math.cos(degreesToRadians(lat1)) * Math.cos(degreesToRadians(lat2)) *
       Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
@@ -101,25 +101,27 @@ const NearbyHospitals = () => {
   return (
     <div
       className="min-h-screen bg-cover bg-center"
-      style={{ 
-        backgroundImage: 'url(/aihospital)', // Reference the image in public folder
-        backgroundSize: 'cover',  // Ensures image covers the screen
-        backgroundPosition: 'center', // Centers the background
-        backgroundAttachment: 'fixed', // Keeps the background fixed while scrolling
+      style={{
+        backgroundImage: 'url(/hospital)', // Background image reference
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
       }}
     >
       <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-lg mt-10 opacity-90">
-        <h2 className="text-3xl font-bold text-center text-blue-600 mb-4">Find Nearby Hospitals</h2>
-        
+        <h2 className="text-3xl font-bold text-center text-purple-800 mb-4">
+          Find Nearby Hospitals
+        </h2>
+
         <button
           onClick={handleGetLocation}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+          className="w-full bg-purple-800 text-white py-2 rounded-lg hover:bg-purple-700 transition"
         >
           Get Nearby Hospitals
         </button>
 
         {address && (
-          <div className="mt-4 text-gray-700">
+          <div className="mt-4 text-purple-700">
             <p><strong>Address:</strong> {address}</p>
           </div>
         )}
@@ -130,20 +132,20 @@ const NearbyHospitals = () => {
           <ul className="mt-6 space-y-4">
             {hospitals.map(hospital => {
               const name = hospital.tags.name || 'Unnamed Hospital/Clinic';
-              const emergencyNumber = hospital.tags.emergency || 'No emergency number available';
+              const emergencyNumber = hospital.tags.phone || 'No contact number available';
               const distance = haversineDistance(location.lat, location.lon, hospital.lat, hospital.lon).toFixed(2);
 
               return (
                 <li
                   key={hospital.id}
-                  className="bg-gray-100 p-4 rounded-lg shadow-sm hover:bg-gray-200 transition"
+                  className="bg-purple-100 p-4 rounded-lg shadow-sm hover:bg-purple-200 transition"
                 >
                   <div className="flex justify-between items-center">
                     <div>
-                      <p className="text-xl font-semibold text-gray-800">{name}</p>
-                      <p className="text-sm text-gray-500">Emergency: {emergencyNumber}</p>
+                      <p className="text-xl font-semibold text-purple-800">{name}</p>
+                      <p className="text-sm text-purple-600">Contact: {emergencyNumber}</p>
                     </div>
-                    <span className="text-sm text-gray-600">{distance} km</span>
+                    <span className="text-sm text-purple-700">{distance} km</span>
                   </div>
                 </li>
               );

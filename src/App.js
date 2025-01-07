@@ -14,6 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/nearby-hospitals" element={<NearbyHospitals />} />
         <Route path="/profile" element={<Profile />} /> {/* Updated path for Profile */}
