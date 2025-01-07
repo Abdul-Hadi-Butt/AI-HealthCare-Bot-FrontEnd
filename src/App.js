@@ -4,8 +4,8 @@ import SignupPage from "./SignupPage";
 import LoginPage from "./LoginPage";
 import Dashboard from "./Dashboard";
 import NearbyHospitals from "./NearbyHospitals";
-import Profile from "./Profile"; // Renamed to Profile for consistency
-import EditProfile from "./EditProfile"; // Ensured proper casing
+import Profile from "./Profile"; 
+import EditProfile from "./EditProfile"; 
 import AboutUs from "./AboutUs";
 
 function App() {
@@ -17,8 +17,8 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/nearby-hospitals" element={<NearbyHospitals />} />
-        <Route path="/profile" element={<Profile />} /> {/* Updated path for Profile */}
-        <Route path="/editprofile" element={<EditProfile />} /> {/* Corrected capitalization */}
+        <Route path="/profile" element={<Profile />} /> 
+        <Route path="/editprofile" element={<EditProfile />} /> 
         <Route path="/about-us" element={<AboutUs />} />
       </Routes>
     </Router>

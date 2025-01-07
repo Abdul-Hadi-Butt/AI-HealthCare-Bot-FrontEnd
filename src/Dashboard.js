@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
-import { diseaseFirstAid } from './diseaseFirstAid'; // Importing the disease and first aid data
+import { diseaseFirstAid } from './diseaseFirstAid'; 
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const Dashboard = () => {
   };
 
   const handleNearbyHospitalsClick = () => {
-    navigate('/nearby-hospitals'); // Navigate to Nearby Hospitals page
+    navigate('/nearby-hospitals'); 
   };
 
   const handleCloseModal = () => setShowModal(false);
@@ -82,7 +82,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <nav className="bg-purple-900 text-white flex items-center justify-between p-4 shadow-md">
+      <nav className="bg-purple-900 text-white flex items-center justify-between p-4 ">
         <div className="flex items-center">
           <img src="HADI.jpg" alt="User DP" className="h-10 w-10 rounded-full mr-3" />
           <span className="font-semibold text-lg">Hi, Abdul Hadi</span>
